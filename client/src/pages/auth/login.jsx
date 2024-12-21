@@ -1,29 +1,31 @@
 import CommonForm from "@/components/common/form";
-import { loginFormControls } from "@/config";
+import { registerFormControls } from "@/config";
 import { useToast } from "@/hooks/use-toast";
-import { loginUser } from "@/store/auth-slice";
+import { registerUser } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const initialState = {
+  userName: "",
   email: "",
   password: "",
 };
 
-function AuthLogin() {
+function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   function onSubmit(event) {
     event.preventDefault();
-
-    dispatch(loginUser(formData)).then((data) => {
+    dispatch(registerUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast({
           title: data?.payload?.message,
         });
+        navigate("/auth/login");
       } else {
         toast({
           title: data?.payload?.message,
@@ -33,31 +35,35 @@ function AuthLogin() {
     });
   }
 
+  console.log(formData);
+
   return (
     <div className="mx-auto w-full max-w-md space-y-6 p-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Sign in to your account
+          Create new account
         </h1>
-        <p className="mt-2">
-          Don't have an account
-          <Link
-            className="font-medium ml-2 text-primary hover:underline"
-            to="/auth/register"
-          >
-            Register
-          </Link>
-        </p>
       </div>
       <CommonForm
-        formControls={loginFormControls}
-        buttonText={"Sign In"}
+        formControls={registerFormControls}
+        buttonText={"Sign Up"}
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
       />
+      <div className="text-center">
+        <p className="mt-2">
+          Already have an account
+          <Link
+            className="font-medium ml-2 text-primary hover:underline"
+            to="/auth/login"
+          >
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
 
-export default AuthLogin;
+export default AuthRegister;
